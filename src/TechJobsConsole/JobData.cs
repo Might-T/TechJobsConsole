@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace TechJobsConsole
 {
@@ -138,5 +140,40 @@ namespace TechJobsConsole
 
             return rowValues.ToArray();
         }
+
+        public static List<Dictionary<string, string>> FindByValue(string searchValue)
+        {
+            // load data, if not already loaded
+            LoadData();
+
+            List<Dictionary<string, string>> jobs = new List<Dictionary<string, string>>();
+
+            foreach (Dictionary<string, string> jobPost in AllJobs)
+            {
+                foreach (KeyValuePair<string, string> jobDetail in jobPost)
+                {
+                    // Define a regular expression for repeated words.
+                    Regex rx = new Regex($"({searchValue})",
+                    RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+                    //Find matches.
+                    MatchCollection matches = rx.Matches(jobDetail.Value);
+
+                    foreach(Match match in matches)
+                    {
+                        //Console.Writeline(match.Success);
+                        if (match.Success && !jobs.Contains(jobPost))
+                            {
+                                jobs.Add(jobPost);
+                            }
+
+
+                    }
+                }
+
+            }
+            return jobs;
+        }
+
     }
 }
